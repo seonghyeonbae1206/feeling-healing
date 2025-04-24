@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>필링힐링 감정 이미지 생성기</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+    #resultCard {
+      width: 400px;
+      height: 400px;
+      border: 2px solid #ccc;
+      padding: 20px;
+      text-align: center;
+    }
+    #resultCard img {
+      width: 150px;
+      margin: 20px 0;
+    }
+    input {
+      margin: 10px;
+      padding: 5px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>필링힐링 감정 이미지 생성기</h1>
+  <input type="text" id="name" placeholder="이름 입력">
+  <input type="number" id="score" placeholder="점수 입력">
+  <button onclick="generateResult()">이미지 만들기</button>
+
+  <div id="resultCard" style="display:none">
+    <h2 id="userName"></h2>
+    <img id="userImage" src="">
+    <p id="userComment"></p>
+  </div>
+  <button id="downloadBtn" style="display:none" onclick="downloadImage()">이미지 다운로드</button>
+
+  <script>
+    function getResultForScore(score) {
+      score = parseInt(score);
+      if (score === 24) return { image: "https://cdn-icons-png.flaticon.com/512/1686/1686819.png", comment: "하..기분 진짜. 된장 고추장 같네. 야 너 이리와봐." };
+      if (score === 27) return { image: "https://cdn-icons-png.flaticon.com/512/1686/1686825.png", comment: "심호흡 따위 개나 줘버려. 진정되게 생겼어?" };
+      if (score === 30) return { image: "https://cdn-icons-png.flaticon.com/512/1686/1686823.png", comment: "뭘봐. 기분 안 좋은 사람 처음봐?" };
+      if (score === 31) return { image: "https://cdn-icons-png.flaticon.com/512/1686/1686823.png", comment: "멍을 때릴까 베개를 때릴까." };
+      if (score === 34) return { image: "https://cdn-icons-png.flaticon.com/512/1686/1686823.png", comment: "한숨만 나오는데 말 할 힘도 없다 지금.." };
+      if (score === 37) return { image: "https://cdn-icons-png.flaticon.com/512/1686/1686823.png", comment: "다 깨부순다 아이언맨 빙의한다 팍씨" };
+      if (score === 40) return { image: "https://cdn-icons-png.flaticon.com/512/1686/1686823.png", comment: "개킹받네 어쩔건데 마인드 좀 형성할게" };
+      return { image: "https://cdn-icons-png.flaticon.com/512/742/742751.png", comment: "기록된 감정이 없어요 😶" };
+    }
+
+    function generateResult() {
+      const name = document.getElementById("name").value;
+      const score = document.getElementById("score").value;
+      if (!name || !score) {
+        alert("이름과 점수를 입력하세요!");
+        return;
+      }
+
+      const result = getResultForScore(score);
+
+      document.getElementById("userName").innerText = `${name}님의 감정 점수는 ${score}점!`;
+      document.getElementById("userImage").src = result.image;
+      document.getElementById("userComment").innerText = result.comment;
+
+      document.getElementById("resultCard").style.display = 'block';
+      document.getElementById("downloadBtn").style.display = 'inline-block';
+    }
+
+    function downloadImage() {
+      html2canvas(document.getElementById("resultCard")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "emotion_result.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
