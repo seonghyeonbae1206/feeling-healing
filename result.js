@@ -15,17 +15,28 @@ function findProfile(score) {
   return resultProfiles.find(p => score >= p.min && score <= p.max);
 }
 
-// 구글시트에 결과 저장하는 함수
-function sendResultToSheet(nickname, score, exitStage, completed, shared) {
+// ✅ 구글시트에 결과 저장하는 함수 (sendBeacon or fetch)
+function sendResultToSheet(nickname, score, exitStage, completed, shared, useFetch = false) {
   if (!nickname || isNaN(score)) {
     console.error('닉네임 또는 점수 정보가 없습니다. 서버 전송 생략');
     return;
   }
 
-  navigator.sendBeacon(
-    'https://script.google.com/macros/s/AKfycbxlj1pkm0H26S46aeDj-ErYqyzyWSkrFmAQLYgODnMVplKViV3wPYposv6X07GP5crv3Q/exec',
-    JSON.stringify({ nickname, score, exitStage, completed, shared })
-  );
+  const payload = JSON.stringify({ nickname, score, exitStage, completed, shared });
+  const url = 'https://script.google.com/macros/s/AKfycbxlj1pkm0H26S46aeDj-ErYqyzyWSkrFmAQLYgODnMVplKViV3wPYposv6X07GP5crv3Q/exec';
+
+  if (useFetch) {
+    // 공유 버튼 클릭 시에는 fetch 사용
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    }).then(() => console.log('✅ fetch로 서버 전송 완료'))
+      .catch(error => console.error('❌ fetch 전송 에러:', error));
+  } else {
+    // 기본 기록은 sendBeacon 사용
+    navigator.sendBeacon(url, payload);
+  }
 }
 
 // ✅ 모든 스크립트는 window.onload 이후에 실행
@@ -43,13 +54,13 @@ window.onload = function() {
   document.getElementById('result-img').src = profile.img;
   document.getElementById('result-logo').src = "your-logo-url.png"; // 나중에 교체
 
-  // ✅ 페이지 로드되자마자 기본 데이터(shared: no) 저장
+  // ✅ 페이지 로드되자마자 기본 데이터(shared: no) 저장 (sendBeacon)
   sendResultToSheet(name, score, 10, "yes", "no");
 
   // 공유 버튼 이벤트
   document.getElementById('share-btn').addEventListener('click', () => {
-    // ✅ 공유 버튼 누르면 shared: yes로 다시 저장
-    sendResultToSheet(name, score, 10, "yes", "yes");
+    // ✅ 공유 버튼 누르면 shared: yes로 서버 저장 (fetch)
+    sendResultToSheet(name, score, 10, "yes", "yes", true);
 
     Kakao.Link.sendDefault({
       objectType: 'feed',
@@ -67,6 +78,4 @@ window.onload = function() {
       ]
     });
   });
-
-  // ✅ 페이지 벗어날 때 추가 작업 필요 없음 (beforeunload 삭제)
 };
