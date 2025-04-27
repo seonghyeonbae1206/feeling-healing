@@ -1,122 +1,19 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>안녕지수 테스트</title>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      background: #f5f8ff;
-    }
-    .page {
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      padding: 20px;
-      text-align: center;
-    }
-    .page.active {
-      display: flex;
-    }
-    h2 {
-      font-size: 1.25rem;
-      margin-bottom: 24px;
-      max-width: 320px;
-    }
-    .circle-wrapper {
-      position: relative;
-      width: 300px;
-      height: 180px;
-      margin-top: 20px;
-    }
-    .circle-wrapper button {
-      position: absolute;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: 2px solid #007bff;
-      background-color: white;
-      color: #007bff;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.2s;
-      transform: translate(-50%, -50%);
-    }
-    .circle-wrapper button:hover {
-      background-color: #007bff;
-      color: white;
-    }
-    .label-row {
-      display: flex;
-      justify-content: space-between;
-      width: 300px;
-      font-size: 14px;
-      color: #666;
-      margin-top: 8px;
-    }
-    .result {
-      display: none;
-      text-align: center;
-      padding: 40px;
-    }
-    #result-container {
-      max-width: 300px;
-      margin: auto;
-      background: #fff;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    #result-img {
-      width: 100px;
-      margin-bottom: 12px;
-    }
-    #result-score {
-      font-size: 32px;
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 8px;
-    }
-    #result-title {
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-    #result-text {
-      font-size: 16px;
-      color: #555;
-    }
-    #share-btn {
-      margin-top: 16px;
-      padding: 10px 20px;
-      font-size: 14px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
+
+  <!-- 기본 스타일 -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="container"></div>
-  <div class="result" id="result-page">
-    <div id="result-container">
-      <img id="result-img" src="" alt="감정 캐릭터">
-      <div id="result-score"></div>
-      <h2 id="result-title"></h2>
-      <p id="result-text"></p>
-      <button id="share-btn">결과 이미지 저장 또는 공유하기</button>
-    </div>
-  </div>
 
   <script>
+    let userName = localStorage.getItem('userName') || "";
+
     const questions = [
       "당신은 지금 당신의 삶에 얼마나 만족합니까?",
       "당신은 지금 얼마나 행복합니까?",
@@ -134,73 +31,83 @@
     const negKeys = [3, 4, 5, 8, 9];
     const answers = new Array(questions.length).fill(null);
 
-    const resultProfiles = [
-      {
-        min: 0, max: 29,
-        title: "조금 지쳐 있는 상태예요",
-        text: "휴식이 필요할 수 있어요. 스스로를 돌보세요.",
-        img: "https://cdn-icons-png.flaticon.com/512/742/742760.png"
-      },
-      {
-        min: 30, max: 39,
-        title: "조금 지쳤지만, 잘 해내고 있어요.",
-        text: "마음을 돌아보며 한 걸음씩 나아가 보세요.",
-        img: "https://cdn-icons-png.flaticon.com/512/742/742758.png"
-      },
-      {
-        min: 40, max: 50,
-        title: "감정 밸런스를 잘 유지하고 있어요.",
-        text: "지금처럼 잘 해내고 있어요. 스스로를 칭찬해주세요.",
-        img: "https://cdn-icons-png.flaticon.com/512/742/742790.png"
-      }
-    ];
-
     const container = document.getElementById("container");
 
-    questions.forEach((q, i) => {
-      const page = document.createElement("div");
-      page.className = "page";
-      if (i === 0) page.classList.add("active");
-      page.innerHTML = `<h2>${q}</h2>`;
+    // 0. 이름 입력 화면
+    const startPage = document.createElement('div');
+    startPage.className = "page active";
+    startPage.innerHTML = `
+      <h2>닉네임을 입력해 주세요</h2>
+      <input type="text" id="name-input" value="${userName}" placeholder="닉네임 입력" style="padding: 10px; font-size: 16px; width: 200px;">
+      <div style="font-size: 14px; color: #666; margin-top: 8px;">실명 말고, 닉네임도 괜찮아요 :)</div>
+      <br><br>
+      <button id="start-btn" style="padding: 10px 20px; font-size: 16px;">시작하기</button>
+    `;
+    container.appendChild(startPage);
 
-      const wrapper = document.createElement("div");
-      wrapper.className = "circle-wrapper";
-
-      const total = 11;
-      const radius = 120;
-      const centerX = 150;
-      const centerY = 140;
-
-      for (let j = 0; j < total; j++) {
-        const angle = Math.PI * (1 + j / (total - 1));
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-
-        const btn = document.createElement("button");
-        btn.textContent = j;
-        btn.style.left = `${x}px`;
-        btn.style.top = `${y}px`;
-        btn.onclick = () => {
-          answers[i] = j;
-          document.querySelectorAll(".page")[i].classList.remove("active");
-          if (i + 1 < questions.length) {
-            document.querySelectorAll(".page")[i + 1].classList.add("active");
-          } else {
-            showResult();
-          }
-        };
-        wrapper.appendChild(btn);
+    document.getElementById('start-btn').addEventListener('click', () => {
+      const input = document.getElementById('name-input').value.trim();
+      if (input === "") {
+        alert("닉네임을 입력해 주세요!");
+        return;
       }
-
-      page.appendChild(wrapper);
-
-      const labelRow = document.createElement("div");
-      labelRow.className = "label-row";
-      labelRow.innerHTML = `<span>전혀 느끼지 않는다</span><span>매우 많이 느끼고 있다</span>`;
-      page.appendChild(labelRow);
-
-      container.appendChild(page);
+      userName = input;
+      localStorage.setItem('userName', userName);
+      showQuestions();
     });
+
+    // 1. 감정 질문 화면
+    function showQuestions() {
+      container.innerHTML = "";
+
+      questions.forEach((q, i) => {
+        const page = document.createElement("div");
+        page.className = "page";
+        if (i === 0) page.classList.add("active");
+        page.innerHTML = `<h2>${q}</h2>`;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "circle-wrapper";
+
+        const total = 11;
+        const radius = 120;
+        const centerX = 150;
+        const centerY = 140;
+
+        for (let j = 0; j < total; j++) {
+          const angle = Math.PI * (1 + j / (total - 1));
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+
+          const btn = document.createElement("button");
+          btn.textContent = j;
+          btn.className = "circle-button";
+          btn.style.left = `${x}px`;
+          btn.style.top = `${y}px`;
+
+          btn.onclick = () => {
+            answers[i] = j;
+            document.querySelectorAll(".page")[i].classList.remove("active");
+            if (i + 1 < questions.length) {
+              document.querySelectorAll(".page")[i + 1].classList.add("active");
+            } else {
+              showResult();
+            }
+          };
+
+          wrapper.appendChild(btn);
+        }
+
+        page.appendChild(wrapper);
+
+        const labelRow = document.createElement("div");
+        labelRow.className = "label-row";
+        labelRow.innerHTML = `<span>전혀 느끼지 않는다</span><span>매우 많이 느끼고 있다</span>`;
+        page.appendChild(labelRow);
+
+        container.appendChild(page);
+      });
+    }
 
     function calculateScore() {
       let pos = 0, neg = 0;
@@ -210,31 +117,48 @@
     }
 
     function showResult() {
-      const score = calculateScore();
-      const result = resultProfiles.find(r => score >= r.min && score <= r.max);
+  const score = calculateScore();
+  const exitStage = answers.filter(a => a !== null).length; // 답변한 질문 수
+  const completed = exitStage === questions.length ? "yes" : "no";
+  const shared = "no"; // 기본은 no
 
-      document.getElementById("result-page").style.display = "block";
-      document.getElementById("result-score").innerText = score;
-      document.getElementById("result-title").innerText = result.title;
-      document.getElementById("result-text").innerText = result.text;
-      document.getElementById("result-img").src = result.img;
-    }
-
-    document.getElementById("share-btn").addEventListener("click", () => {
-      html2canvas(document.getElementById("result-container")).then(canvas => {
-        canvas.toBlob(blob => {
-          if (navigator.share && navigator.canShare({ files: [new File([blob], "result.png", { type: blob.type })] })) {
-            const file = new File([blob], "result.png", { type: blob.type });
-            navigator.share({ files: [file], title: "내 안녕지수 결과" });
-          } else {
-            const link = document.createElement("a");
-            link.download = "result.png";
-            link.href = canvas.toDataURL();
-            link.click();
-          }
-        });
-      });
+  sendResultToSheet(userName, score, exitStage, completed, shared)
+    .then(() => {
+      // ✅ fetch 성공 후 result.html 이동
+      moveToResultPage(score);
+    })
+    .catch(error => {
+      console.error('❌ 구글시트 전송 에러:', error);
+      // ❗ 실패해도 result.html로 이동은 한다
+      moveToResultPage(score);
     });
+}
+
+function moveToResultPage(score) {
+  const userName = localStorage.getItem('userName') || "익명";
+  window.location.href = `result.html?score=${score}&name=${encodeURIComponent(userName)}`;
+}
+
+// fetch 요청하는 함수
+function sendResultToSheet(nickname, score, exitStage, completed, shared) {
+  return fetch('https://script.google.com/macros/s/AKfycbxlj1pkm0H26S46aeDj-ErYqyzyWSkrFmAQLYgODnMVplKViV3wPYposv6X07GP5crv3Q/exec', {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      nickname: nickname,
+      score: score,
+      exitStage: exitStage,
+      completed: completed,
+      shared: shared
+    })
+  });
+}
+
+
+
   </script>
 </body>
 </html>

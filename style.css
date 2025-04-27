@@ -1,0 +1,66 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    background: #f5f8ff;
+  }
+  
+  /* 각 질문 페이지 */
+  .page {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+    text-align: center;
+  }
+  .page.active {
+    display: flex;
+  }
+  
+  /* 질문 제목 */
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+  }
+  
+  /* 버튼 원형 배치 */
+  .circle-wrapper {
+    position: relative;
+    width: 300px;
+    height: 180px;
+    margin: 20px auto;
+  }
+  
+  /* 감정 선택 버튼 */
+  .circle-button {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    background-color: white;
+    color: #007bff;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: 0.2s;
+  }
+  
+  .circle-button:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  /* 선택 레이블 (0점, 10점 표시) */
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    width: 300px;
+    font-size: 14px;
+    color: #666;
+    margin-top: 8px;
+  }
+  

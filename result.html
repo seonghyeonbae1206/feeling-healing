@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내 마음 결과</title>
+
+  <link rel="stylesheet" href="result.css">
+
+  <!-- Kakao SDK 추가 -->
+  <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+</head>
+<body>
+  <div id="result-container">
+    <img id="result-logo" src="your-logo-url.png" alt="로고" style="width: 80px; margin-bottom: 16px;">
+    <div id="nickname" style="font-size: 18px; font-weight: bold; margin-bottom: 8px;"></div>
+    <div id="result-score" style="font-size: 32px; font-weight: bold; margin-bottom: 8px;"></div>
+    <div id="result-title" style="font-size: 24px; margin-bottom: 8px;"></div>
+    <div id="result-text" style="font-size: 16px; color: #555;"></div>
+    <img id="result-img" src="" alt="감정 캐릭터" style="width: 150px; margin-top: 20px;">
+    <br><br>
+    <button id="share-btn">카카오톡으로 공유하기 📩</button>
+  </div>
+
+  <script>
+    // 카카오 초기화
+    Kakao.init('2facc9f39347ae1f2bca2651543e2ed5');
+
+    // URL에서 점수와 이름 받아오기
+    const urlParams = new URLSearchParams(window.location.search);
+    const score = parseInt(urlParams.get('score'));
+    const nickname = decodeURIComponent(urlParams.get('name') || "익명");
+
+    // 결과 프로필 매칭
+    const resultProfiles = [
+      {
+        min: 0, max: 29,
+        title: "조금 지쳐 있는 상태예요",
+        text: "휴식이 필요할 수 있어요. 스스로를 돌보세요.",
+        img: "https://cdn-icons-png.flaticon.com/512/742/742760.png"
+      },
+      {
+        min: 30, max: 39,
+        title: "조금 지쳤지만, 잘 해내고 있어요.",
+        text: "마음을 돌아보며 한 걸음씩 나아가 보세요.",
+        img: "https://cdn-icons-png.flaticon.com/512/742/742758.png"
+      },
+      {
+        min: 40, max: 50,
+        title: "감정 밸런스를 잘 유지하고 있어요.",
+        text: "지금처럼 잘 해내고 있어요. 스스로를 칭찬해주세요.",
+        img: "https://cdn-icons-png.flaticon.com/512/742/742790.png"
+      }
+    ];
+
+    function findProfile(score) {
+      return resultProfiles.find(p => score >= p.min && score <= p.max);
+    }
+
+    function showResult() {
+      const profile = findProfile(score);
+
+      document.getElementById('nickname').innerText = nickname;
+      document.getElementById('result-score').innerText = `${score}점`;
+      document.getElementById('result-title').innerText = profile.title;
+      document.getElementById('result-text').innerText = profile.text;
+      document.getElementById('result-img').src = profile.img;
+      document.getElementById('result-logo').src = "your-logo-url.png"; // 나중에 진짜 로고로 교체
+    }
+
+    showResult();
+
+    // 카카오 공유 기능
+    document.getElementById('share-btn').addEventListener('click', () => {
+      const profile = findProfile(score);
+
+      Kakao.Link.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: '내 감정 결과',
+          description: `${profile.title} - ${profile.text}`,
+          imageUrl: profile.img,
+          link: {
+            mobileWebUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/',
+            webUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/'
+          }
+        },
+        buttons: [
+          {
+            title: '나도 감정 테스트하기',
+            link: {
+              mobileWebUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/',
+              webUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/'
+            }
+          }
+        ]
+      });
+
+      // 만약 공유 성공시, shared 상태 업데이트하고 싶으면 여기 추가 가능
+    });
+  </script>
+</body>
+</html>
