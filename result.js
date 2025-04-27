@@ -1,6 +1,3 @@
-// Kakao 초기화
-Kakao.init('2facc9f39347ae1f2bca2651543e2ed5');
-
 // URL에서 점수와 이름 받아오기
 const urlParams = new URLSearchParams(window.location.search);
 const score = parseInt(urlParams.get('score'));
@@ -18,18 +15,6 @@ function findProfile(score) {
   return resultProfiles.find(p => score >= p.min && score <= p.max);
 }
 
-// 결과 표시하기
-function showResult() {
-  const profile = findProfile(score);
-
-  document.getElementById('nickname').innerText = `${name}님의 결과`;
-  document.getElementById('result-score').innerText = `${score}점`;
-  document.getElementById('result-title').innerText = profile.title;
-  document.getElementById('result-text').innerText = profile.text;
-  document.getElementById('result-img').src = profile.img;
-  document.getElementById('result-logo').src = "your-logo-url.png"; // 나중에 진짜 로고로 교체
-}
-
 // 구글시트에 결과 저장하는 함수
 function sendResultToSheet(nickname, score, exitStage, completed, shared) {
   if (!nickname || isNaN(score)) {
@@ -43,39 +28,45 @@ function sendResultToSheet(nickname, score, exitStage, completed, shared) {
   );
 }
 
-// 결과 화면 띄우기
-showResult();
+// ✅ 모든 스크립트는 window.onload 이후에 실행
+window.onload = function() {
+  // Kakao SDK 초기화
+  Kakao.init('2facc9f39347ae1f2bca2651543e2ed5');
+  console.log('✅ Kakao SDK 초기화 완료');
 
-// 공유 여부를 추적하는 변수
-let hasShared = false;
-
-// 공유 버튼 이벤트
-document.getElementById('share-btn').addEventListener('click', () => {
+  // 결과 화면 띄우기
   const profile = findProfile(score);
+  document.getElementById('nickname').innerText = `${name}님의 결과`;
+  document.getElementById('result-score').innerText = `${score}점`;
+  document.getElementById('result-title').innerText = profile.title;
+  document.getElementById('result-text').innerText = profile.text;
+  document.getElementById('result-img').src = profile.img;
+  document.getElementById('result-logo').src = "your-logo-url.png"; // 나중에 교체
 
-  Kakao.Link.sendDefault({
-    objectType: 'feed',
-    content: {
-      title: '내 감정 결과',
-      description: `${profile.title} - ${profile.text}`,
-      imageUrl: profile.img,
-      link: {
-        mobileWebUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/',
-        webUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/'
-      }
-    },
-    buttons: [
-      { title: '나도 감정 테스트하기', link: { mobileWebUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/', webUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/' } }
-    ]
+  // ✅ 페이지 로드되자마자 기본 데이터(shared: no) 저장
+  sendResultToSheet(name, score, 10, "yes", "no");
+
+  // 공유 버튼 이벤트
+  document.getElementById('share-btn').addEventListener('click', () => {
+    // ✅ 공유 버튼 누르면 shared: yes로 다시 저장
+    sendResultToSheet(name, score, 10, "yes", "yes");
+
+    Kakao.Link.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '내 감정 결과',
+        description: `${profile.title} - ${profile.text}`,
+        imageUrl: profile.img,
+        link: {
+          mobileWebUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/',
+          webUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/'
+        }
+      },
+      buttons: [
+        { title: '나도 감정 테스트하기', link: { mobileWebUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/', webUrl: 'https://seonghyeonbae1206.github.io/feeling-healing/' } }
+      ]
+    });
   });
 
-  hasShared = true;
-  sendResultToSheet(name, score, 10, "yes", "yes"); // 공유 버튼 누르면 바로 yes 저장
-});
-
-// 페이지 벗어나기 직전에 no로 서버 전송
-window.addEventListener('beforeunload', (e) => {
-  if (!hasShared) {
-    sendResultToSheet(name, score, 10, "yes", "no"); // 공유 안했으면 no 저장
-  }
-});
+  // ✅ 페이지 벗어날 때 추가 작업 필요 없음 (beforeunload 삭제)
+};
