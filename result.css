@@ -1,83 +1,193 @@
-/* 전체 페이지 기본 설정 */
+/* 전체 배경 */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Helvetica', 'Arial', sans-serif;
-    background: #f5f8ff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
-  
-  /* 결과 카드 */
-  #result-container {
-    background: white;
-    padding: 32px 24px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 320px;
-    text-align: center;
-  }
-  
-  /* 로고 */
-  #result-logo {
-    width: 80px;
-    margin-bottom: 16px;
-  }
-  
-  /* 닉네임 (필요시) */
-  #nickname {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 8px;
-  }
-  
-  /* 점수 */
-  #result-score {
-    font-size: 36px;
-    font-weight: bold;
-    color: #2c3e50;
-    margin-bottom: 12px;
-  }
-  
-  /* 결과 타이틀 */
-  #result-title {
-    font-size: 24px;
-    font-weight: 600;
-    color: #007bff;
-    margin-bottom: 8px;
-  }
-  
-  /* 결과 설명 */
-  #result-text {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 16px;
-    line-height: 1.4;
-  }
-  
-  /* 감정 캐릭터 이미지 */
-  #result-img {
-    width: 150px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-  
-  /* 공유 버튼 */
-  #share-btn {
-    margin-top: 16px;
-    padding: 12px 24px;
-    font-size: 16px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  #share-btn:hover {
-    background-color: #218838;
-  }
-  
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard', 'Helvetica', 'Arial', sans-serif;
+  background: #f5f8ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* 메인 컨테이너 */
+#result-container {
+  background: white;
+  padding: 30px 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 420px;
+  text-align: center;
+}
+
+/* 퍼센트 반원 차트 */
+#percent-wrapper {
+  margin-top: -200px;
+}
+
+#percent-chart {
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+/* 퍼센트 텍스트 */
+#percent-text {
+  font-size: 36px;
+  font-weight: 800;
+  color: #0C31AC;
+  margin-top: -130px;
+  margin-bottom: 5px;
+}
+
+/* 평균 텍스트 */
+#percent-subtext {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+/* 감정 캐릭터 + 레이더차트 flex 정렬 */
+#emotion-radar-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+#emotion-card, #radar-card {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+#emotion-img {
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+}
+
+/* 아래 요소가 무조건 아래로 내려가게 하는 핵심 */
+#emotion-comment,
+#extra-ment,
+#hashtags,
+#feeling-quote-box {
+  display: block;
+  clear: both;
+  width: 100%;
+  text-align: center;
+}
+
+
+/* 캐릭터 한마디 */
+#emotion-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 0 20px; /* 좌우 여백 추가해서 삐져나오지 않게 */
+  box-sizing: border-box; /* padding 포함해서 width 계산 */
+  margin-top: 30px;
+}
+
+/* 공통 - 박스 */
+.pink-bubble, .blue-bubble {
+  width: 100%; /* 부모 안에서만 100% 차지 */
+  padding: 16px;
+  border-radius: 10px;
+  position: relative;
+  text-align: left;
+  box-sizing: border-box; /* border까지 포함 */
+}
+
+/* 핑크 */
+.pink-bubble {
+  background: #FFFAFA;
+  border: 1px solid #FFE8E8;
+}
+
+.pink-bubble::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: -18px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent #FFE8E8 transparent transparent;
+}
+
+/* 파랑 */
+.blue-bubble {
+  background: #F3F8FF;
+  border: 1px solid #B5DEFF;
+  text-align: center;
+}
+
+.blue-bubble::after {
+  content: "";
+  position: absolute;
+  top: 12px;           /* 꼬리 수직 위치는 동일하게 유지 */
+  right: -18px;         /* ⬅️ 오른쪽으로 이동 */
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent transparent #B5DEFF; /* ⬅️ 왼쪽 방향 꼬리 */
+}
+
+
+/* 텍스트 스타일 */
+.emotion-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #202020;
+  margin-bottom: 8px;
+}
+
+.emotion-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: #7F7F7F;
+}
+
+.extra-ment {
+  font-size: 14px;
+  font-weight: 500;
+  color: #202020;
+  margin-top: 6px;
+}
+
+#hashtags {
+  font-size: 13px;
+  color: #7f7f7f;
+  text-align: center;
+  margin-top: 0px;
+  margin-bottom: 20px;
+}
+
+/* 필링 한마디 박스 */
+#feeling-quote-box {
+  background: #f8f8f8;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 30px;
+  box-sizing: border-box;
+  clear: both;
+  display: block;
+}
+
+/* 필링 한마디 제목 */
+#feeling-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* 필링 한마디 본문 */
+#feeling-quote {
+  font-size: 14px;
+  color: #2D2D2D;
+  line-height: 1.5;
+  font-style: italic;
+}
